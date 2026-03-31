@@ -71,7 +71,7 @@ def init_models():
     pinecone_index = pc.Index(PINECONE_INDEX_NAME)
 
     # Load BM25
-    pkl_path = r"D:\Classess\ITA\Rag_Project\Heart Attack Project\bm25_data.pkl"
+    pkl_path = os.path.join(os.path.dirname(__file__), "bm25_data.pkl")
     with open(pkl_path, "rb") as f:
         data = pickle.load(f)
     bm25_retriever = BM25Retriever.from_documents(data["docs"], k=5)
