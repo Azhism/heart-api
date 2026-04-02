@@ -338,16 +338,43 @@ def get_health_tips():
 # ============================================
 @app.route('/assets/<path:filename>')
 def serve_assets(filename):
-    """Serve static assets (JS, CSS, etc.)"""
-    return send_from_directory(os.path.join(app.static_folder, 'assets'), filename)
+    """Serve static assets (JS, CSS, etc.) - assets are at root level"""
+    # Try to find the file in the static folder (root level)
+    file_path = os.path.join(app.static_folder, filename)
+    if os.path.exists(file_path):
+        # Determine correct MIME type
+        if filename.endswith('.js'):
+            return send_from_directory(app.static_folder, filename, mimetype='application/javascript; charset=utf-8')
+        elif filename.endswith('.css'):
+            return send_from_directory(app.static_folder, filename, mimetype='text/css; charset=utf-8')
+        else:
+            return send_from_directory(app.static_folder, filename)
+    
+    # If not found, return 404
+    return jsonify({'error': 'Asset not found: ' + filename}), 404
 
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
     """Serve React app - catch-all for SPA routing"""
-    if path and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
+    # Skip API routes - let them be handled by their handlers
+    if path.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
+    
+    # Try to serve the file directly if it exists
+    if path:
+        file_path = os.path.join(app.static_folder, path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            # Determine correct MIME type
+            if path.endswith('.js'):
+                return send_from_directory(app.static_folder, path, mimetype='application/javascript; charset=utf-8')
+            elif path.endswith('.css'):
+                return send_from_directory(app.static_folder, path, mimetype='text/css; charset=utf-8')
+            else:
+                return send_from_directory(app.static_folder, path)
+    
+    # Otherwise, serve index.html for React routing
     return send_from_directory(app.static_folder, 'index.html')
 
 
@@ -360,7 +387,7 @@ def not_found(error):
     if request.path.startswith('/api/'):
         return jsonify({'error': 'API endpoint not found'}), 404
     # For frontend routes, serve index.html (SPA routing)
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory(app.static_folder, 'index.html'), 200
 
 
 @app.errorhandler(500)
