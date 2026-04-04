@@ -9,7 +9,14 @@ import os, re, pickle, json
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-app = Flask(__name__, static_folder='dist', static_url_path='')
+# Determine static folder path (works in dev and HF Space)
+static_folder = os.path.join(os.path.dirname(__file__), 'dist')
+if not os.path.exists(static_folder):
+    static_folder = os.path.join(os.path.dirname(__file__), 'heart-health-ai', 'dist')
+if not os.path.exists(static_folder):
+    static_folder = 'dist'  # Fallback
+
+app = Flask(__name__, static_folder=static_folder, static_url_path='')
 CORS(app)
 
 # Environment variables / Secrets
