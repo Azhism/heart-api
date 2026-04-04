@@ -1,4 +1,4 @@
-# ❤️ Dil Ki Baatein: RAG-Based Cardiovascular Health Q&A System
+#  Dil Ki Baatein: RAG-Based Cardiovascular Health Q&A System
 
 A production-ready **Retrieval-Augmented Generation (RAG) system** for personalized cardiovascular health risk assessment, purpose-built for Pakistani patients. Combines WHO guidelines, Pakistani Hypertension League standards, and localized nutritional data into a conversational health assistant.
 
@@ -7,11 +7,11 @@ A production-ready **Retrieval-Augmented Generation (RAG) system** for personali
 **Team:** Azhab Safwan Babar && Arham Altaf  
 **Domain:** Cardiovascular & Preventive Health (Pakistan)
 
-**🌐 Live Demo:** [HuggingFace Spaces](https://huggingface.co/spaces/azhab/heart-attack-assessment)
+** Live Demo:** [HuggingFace Spaces](https://huggingface.co/spaces/azhab/heart-attack-assessment)
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Features](#features)
 - [Architecture](#architecture)
@@ -287,7 +287,7 @@ curl -X POST http://localhost:5000/api/assess \
 
 ---
 
-## 🔍 RAG Pipeline Architecture
+##  RAG Pipeline Architecture
 
 This section details the complete 4-stage retrieval-augmented generation pipeline that powers Dil Ki Baatein.
 
@@ -629,7 +629,7 @@ def serve_index():
 
 ---
 
-## 📈 Performance Metrics
+##  Performance Metrics
 
 ### Speed
 - **Frontend → API:** ~50ms (network)
