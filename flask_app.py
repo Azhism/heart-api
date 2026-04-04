@@ -9,12 +9,24 @@ import os, re, pickle, json
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-# Determine static folder path (works in dev and HF Space)
-static_folder = os.path.join(os.path.dirname(__file__), 'dist')
-if not os.path.exists(static_folder):
-    static_folder = os.path.join(os.path.dirname(__file__), 'heart-health-ai', 'dist')
-if not os.path.exists(static_folder):
-    static_folder = 'dist'  # Fallback
+def resolve_static_folder():
+    """Prefer the build output directory used by the Dockerfile."""
+    base_dir = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(base_dir, 'heart-health-ai', 'dist'),
+        os.path.join(base_dir, 'dist'),
+        'dist',
+    ]
+
+    for candidate in candidates:
+        index_file = os.path.join(candidate, 'index.html')
+        if os.path.exists(index_file):
+            return candidate
+
+    return candidates[0]
+
+
+static_folder = resolve_static_folder()
 
 app = Flask(__name__, static_folder=static_folder, static_url_path='')
 CORS(app)
@@ -190,6 +202,21 @@ def evaluate_relevancy(query, answer):
 @app.route('/', methods=['GET'])
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/assets/<path:filename>', methods=['GET'])
+def serve_assets(filename):
+    for folder in [app.static_folder, os.path.join(os.path.dirname(__file__), 'heart-health-ai', 'dist')]:
+        assets_folder = os.path.join(folder, 'assets')
+        file_path = os.path.join(assets_folder, filename)
+        if os.path.exists(file_path):
+            if filename.endswith('.js'):
+                return send_from_directory(assets_folder, filename, mimetype='application/javascript; charset=utf-8')
+            if filename.endswith('.css'):
+                return send_from_directory(assets_folder, filename, mimetype='text/css; charset=utf-8')
+            return send_from_directory(assets_folder, filename)
+
+    return jsonify({'error': f'Asset not found: {filename}'}), 404
 
 @app.route('/<path:path>', methods=['GET'])
 def serve_static(path):
