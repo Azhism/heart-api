@@ -94,6 +94,11 @@ def load_models():
     
     print("✅ All models loaded successfully")
 
+
+# ✅ Load models at module level so gunicorn picks them up
+load_models()
+
+
 def semantic_search(query, k=5):
     global embedding_model, index
     query_vector = embedding_model.encode(query).tolist()
@@ -283,7 +288,7 @@ ANSWER:"""
         
         return jsonify({
             'success': True,
-            'riskLevel': 'consultation_recommended',  # Always recommend consultation
+            'riskLevel': 'consultation_recommended',
             'assessment': answer,
             'recommendations': ['Consult with a healthcare professional for personalized advice'],
             'metrics': {
@@ -312,10 +317,5 @@ def health_check():
     return jsonify({'status': 'ok', 'pinecone_index': PINECONE_INDEX_NAME})
 
 if __name__ == '__main__':
-    try:
-        load_models()
-        print("Starting Flask server on port 7860...")
-        app.run(host='0.0.0.0', port=7860, debug=False)
-    except Exception as e:
-        print(f"Failed to start server: {e}")
-        exit(1)
+    print("Starting Flask server on port 7860...")
+    app.run(host='0.0.0.0', port=7860, debug=False)
