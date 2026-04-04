@@ -207,14 +207,18 @@ def serve_index():
 @app.route('/assets/<path:filename>', methods=['GET'])
 def serve_assets(filename):
     for folder in [app.static_folder, os.path.join(os.path.dirname(__file__), 'heart-health-ai', 'dist')]:
-        assets_folder = os.path.join(folder, 'assets')
-        file_path = os.path.join(assets_folder, filename)
-        if os.path.exists(file_path):
-            if filename.endswith('.js'):
-                return send_from_directory(assets_folder, filename, mimetype='application/javascript; charset=utf-8')
-            if filename.endswith('.css'):
-                return send_from_directory(assets_folder, filename, mimetype='text/css; charset=utf-8')
-            return send_from_directory(assets_folder, filename)
+        candidates = [
+            os.path.join(folder, 'assets', filename),
+            os.path.join(folder, filename),
+        ]
+
+        for file_path in candidates:
+            if os.path.exists(file_path):
+                if file_path.endswith('.js'):
+                    return send_from_directory(os.path.dirname(file_path), os.path.basename(file_path), mimetype='application/javascript; charset=utf-8')
+                if file_path.endswith('.css'):
+                    return send_from_directory(os.path.dirname(file_path), os.path.basename(file_path), mimetype='text/css; charset=utf-8')
+                return send_from_directory(os.path.dirname(file_path), os.path.basename(file_path))
 
     return jsonify({'error': f'Asset not found: {filename}'}), 404
 
