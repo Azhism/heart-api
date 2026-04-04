@@ -15,16 +15,15 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Copy application code
-COPY app.py .
-COPY flask_api.py .
+COPY flask_app.py .
 COPY bm25_data.pkl .
 
-# Copy React dist folder
-COPY heart-health-ai/dist ./heart-health-ai/dist
+# Copy React dist files (without favicon.ico as it's not always present)
+COPY index.html index*.css index*.js placeholder.svg robots.txt ./heart-health-ai/dist/
 
 # Expose port
 EXPOSE 7860
 
 # Environment variables must be set by HF Spaces secrets
-# Run the app
-CMD ["python", "app.py"]
+# Run the Flask app with Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "1", "--timeout", "120", "flask_app:app"]
