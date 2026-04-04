@@ -9,7 +9,7 @@ import os, re, pickle, json
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-app = Flask(__name__, static_folder='heart-health-ai/dist', static_url_path='')
+app = Flask(__name__, static_folder='dist', static_url_path='')
 CORS(app)
 
 # Environment variables / Secrets
